@@ -444,9 +444,11 @@ export default function Home() {
       <header className="sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 py-4" id="app_header">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="bg-slate-900 text-white p-2 rounded-lg flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-indigo-400" />
-            </div>
+            <img
+              src="https://th.bing.com/th/id/ODF.B3yHcXobwmM2UmmadbiAaA?w=32&h=32&qlt=90&pcl=fffffc&o=6&pid=1.2"
+              alt="GrowEasy Logo"
+              className="h-8 w-8 rounded-lg object-contain shrink-0"
+            />
             <div>
               <h1 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900 dark:text-white">GrowEasy</h1>
               <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-mono">CRM AI CSV Importer</p>
@@ -455,10 +457,6 @@ export default function Home() {
 
           <div className="flex items-center space-x-3">
             <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-            <div className="hidden sm:flex items-center space-x-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-              <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              <span>Secure Server-Side AI Mapping</span>
-            </div>
           </div>
         </div>
       </header>

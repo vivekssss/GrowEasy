@@ -7,17 +7,27 @@ interface ThemeToggleProps {
 }
 
 export default function ThemeToggle({ theme, toggleTheme }: ThemeToggleProps) {
+  const isDark = theme === "dark";
+
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors focus:outline-none cursor-pointer"
+      className="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 dark:bg-slate-800 transition-colors duration-300 ease-in-out focus:outline-none"
       aria-label="Toggle dark mode"
     >
-      {theme === "light" ? (
-        <Moon className="h-4 w-4 text-slate-600" />
-      ) : (
-        <Sun className="h-4 w-4 text-amber-400" />
-      )}
+      <span
+        className={`pointer-events-none flex h-6 w-6 transform items-center justify-center rounded-full bg-white dark:bg-slate-950 shadow-md ring-0 transition duration-300 ease-in-out ${
+          isDark ? "translate-x-7" : "translate-x-0"
+        }`}
+      >
+        {isDark ? (
+          <Moon className="h-3.5 w-3.5 text-indigo-400 fill-indigo-400/10" />
+        ) : (
+          <Sun className="h-3.5 w-3.5 text-amber-500 fill-amber-500/10" />
+        )}
+      </span>
+      <Sun className={`absolute left-1.5 top-1.5 h-3.5 w-3.5 text-slate-400 dark:text-slate-500 transition-opacity duration-300 ${isDark ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+      <Moon className={`absolute right-1.5 top-1.5 h-3.5 w-3.5 text-slate-400 dark:text-slate-500 transition-opacity duration-300 ${isDark ? "opacity-0 pointer-events-none" : "opacity-100"}`} />
     </button>
   );
 }
