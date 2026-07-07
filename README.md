@@ -1,4 +1,4 @@
-# GrowEasy - AI-Powered CSV Importer 🚀
+# GrowEasy - AI-Powered CSV Importer 
 
 An intelligent, high-performance CSV Importer designed to onboard messy lead sheets into the **GrowEasy CRM** format. Powered by **Gemini 3.5 Flash** and built with **Next.js**, **React 19**, and **Tailwind CSS v4**.
 
@@ -6,12 +6,12 @@ An intelligent, high-performance CSV Importer designed to onboard messy lead she
 
 ## Key Features
 
-*   🧠 **Dynamic AI Column Mapping:** Automatically parses, cleans, and structures raw spreadsheets regardless of column layout, wording, or casing (e.g. mapping "Primary Contact" or "Alt Mobile" to structured CRM phone entries).
-*   ⚡ **Client-Side Preview:** Instantly parses CSVs in-browser using `PapaParse` for quick preview rendering. No AI costs are incurred before confirming import.
-*   🌗 **Gorgeous Dark Mode Support:** Includes a stateful theme toggler integrated directly into Next.js using Tailwind CSS v4 selector-based compilation.
-*   📦 **Lightweight List Virtualization:** Uses a custom scroll container windowing renderer to render thousands of rows in the Results Dashboard with zero browser lag.
-*   🔄 **Resilient Batch Processing:** Divides large datasets into batches of `15` to stay within token windows, prevent timeouts, and allow the user to **resume import** if a batch is interrupted.
-*   🐋 **Dockerized Deployment:** Features a multi-stage production build configuration for containerized runs.
+*   **Dynamic AI Column Mapping:** Automatically parses, cleans, and structures raw spreadsheets regardless of column layout, wording, or casing (e.g. mapping "Primary Contact" or "Alt Mobile" to structured CRM phone entries).
+*    **Client-Side Preview:** Instantly parses CSVs in-browser using `PapaParse` for quick preview rendering. No AI costs are incurred before confirming import.
+*    **Gorgeous Dark Mode Support:** Includes a stateful theme toggler integrated directly into Next.js using Tailwind CSS v4 selector-based compilation.
+*   **Lightweight List Virtualization:** Uses a custom scroll container windowing renderer to render thousands of rows in the Results Dashboard with zero browser lag.
+*    **Resilient Batch Processing:** Divides large datasets into batches of `15` to stay within token windows, prevent timeouts, and allow the user to **resume import** if a batch is interrupted.
+*   **Dockerized Deployment:** Features a multi-stage production build configuration for containerized runs.
 
 ---
 
