@@ -102,7 +102,7 @@ describe("POST /api/import", () => {
     });
 
     const response = await POST(request);
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
 
     const json = await response.json();
     expect(json.error).toContain("Gemini API key is not configured");

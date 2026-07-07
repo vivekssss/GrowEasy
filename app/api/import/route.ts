@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { records, originalHeaders } = await req.json();
+    const { records, originalHeaders, provider, customApiKey } = await req.json();
 
     if (!records || !Array.isArray(records)) {
       return NextResponse.json(
@@ -11,117 +11,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json(
-        { error: "Gemini API key is not configured. Please add GEMINI_API_KEY in Settings > Secrets." },
-        { status: 500 }
-      );
-    }
-
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-      httpOptions: {
-        headers: {
-          "User-Agent": "groweasy-importer",
-        },
-      },
-    });
-
-    const responseSchema = {
-      type: Type.OBJECT,
-      properties: {
-        results: {
-          type: Type.ARRAY,
-          description: "List of mapped and skipped records corresponding to the input records.",
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              originalIndex: { 
-                type: Type.INTEGER, 
-                description: "The zero-based index of the record in the input batch." 
-              },
-              isSkipped: { 
-                type: Type.BOOLEAN, 
-                description: "True if the record contains neither an email nor a mobile number, or is otherwise invalid." 
-              },
-              skipReason: { 
-                type: Type.STRING, 
-                description: "The reason for skipping (e.g., 'Missing email and mobile number'). Null if not skipped." 
-              },
-              extracted: {
-                type: Type.OBJECT,
-                description: "The mapped GrowEasy CRM lead object.",
-                properties: {
-                  created_at: { 
-                    type: Type.STRING, 
-                    description: "Lead creation date, must be convertible using JavaScript new Date(created_at). Format: YYYY-MM-DD HH:mm:ss. If raw date is missing, use current date/time." 
-                  },
-                  name: { 
-                    type: Type.STRING, 
-                    description: "Lead full name. If split into First Name/Last Name, concatenate them. Null if missing." 
-                  },
-                  email: { 
-                    type: Type.STRING, 
-                    description: "Primary email. If multiple emails exist, use the first, and append the rest to crm_note." 
-                  },
-                  country_code: { 
-                    type: Type.STRING, 
-                    description: "Country dialing code (e.g., +91, +1). Null if missing." 
-                  },
-                  mobile_without_country_code: { 
-                    type: Type.STRING, 
-                    description: "Mobile phone number without country code. If multiple numbers exist, use the first, and append the rest to crm_note." 
-                  },
-                  company: { 
-                    type: Type.STRING, 
-                    description: "Company name. Null if missing." 
-                  },
-                  city: { 
-                    type: Type.STRING, 
-                    description: "City name. Null if missing." 
-                  },
-                  state: { 
-                    type: Type.STRING, 
-                    description: "State name. Null if missing." 
-                  },
-                  country: { 
-                    type: Type.STRING, 
-                    description: "Country name. Null if missing." 
-                  },
-                  lead_owner: { 
-                    type: Type.STRING, 
-                    description: "Email address or name of the lead owner. Null if missing." 
-                  },
-                  crm_status: { 
-                    type: Type.STRING, 
-                    description: "Lead status. Map raw status to exactly one of: GOOD_LEAD_FOLLOW_UP, DID_NOT_CONNECT, BAD_LEAD, SALE_DONE. Map other terms contextually. Null if missing." 
-                  },
-                  crm_note: { 
-                    type: Type.STRING, 
-                    description: "Remarks, follow-up logs, other comments, or extra emails/mobile numbers. Concat multiple notes if needed. Null if missing." 
-                  },
-                  data_source: { 
-                    type: Type.STRING, 
-                    description: "Lead acquisition source. MUST match one of: leads_on_demand, meridian_tower, eden_park, varah_swamy, sarjapur_plots. Null if not confidently matched." 
-                  },
-                  possession_time: { 
-                    type: Type.STRING, 
-                    description: "Property possession time or timeframe. Null if missing." 
-                  },
-                  description: { 
-                    type: Type.STRING, 
-                    description: "Additional description, requirements, or logs. Null if missing." 
-                  },
-                },
-              },
-            },
-            required: ["originalIndex", "isSkipped"],
-          },
-        },
-      },
-      required: ["results"],
-    };
 
     const systemInstruction = `You are the core AI Mapper for GrowEasy CRM.
 Your task is to take messy raw CSV records (represented as key-value JSON objects) and intelligently map, clean, and extract them into the standard GrowEasy CRM lead schema.
@@ -161,24 +50,167 @@ ${JSON.stringify(originalHeaders)}
 Process the following batch of raw CSV records:
 ${JSON.stringify(records)}`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema,
-        temperature: 0.1, // Low temperature for high precision and strict rule compliance
+    const responseSchema = {
+      type: Type.OBJECT,
+      properties: {
+        results: {
+          type: Type.ARRAY,
+          description: "List of mapped and skipped records corresponding to the input records.",
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              originalIndex: { type: Type.INTEGER },
+              isSkipped: { type: Type.BOOLEAN },
+              skipReason: { type: Type.STRING },
+              extracted: {
+                type: Type.OBJECT,
+                properties: {
+                  created_at: { type: Type.STRING },
+                  name: { type: Type.STRING },
+                  email: { type: Type.STRING },
+                  country_code: { type: Type.STRING },
+                  mobile_without_country_code: { type: Type.STRING },
+                  company: { type: Type.STRING },
+                  city: { type: Type.STRING },
+                  state: { type: Type.STRING },
+                  country: { type: Type.STRING },
+                  lead_owner: { type: Type.STRING },
+                  crm_status: { type: Type.STRING },
+                  crm_note: { type: Type.STRING },
+                  data_source: { type: Type.STRING },
+                  possession_time: { type: Type.STRING },
+                  description: { type: Type.STRING },
+                },
+              },
+            },
+            required: ["originalIndex", "isSkipped"],
+          },
+        },
       },
-    });
+      required: ["results"],
+    };
 
-    const text = response.text;
-    if (!text) {
-      throw new Error("Empty response from Gemini API.");
+    if (provider === "openai") {
+      const apiKey = customApiKey || process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json(
+          { error: "OpenAI API key is not configured. Please add it in your UI Configuration." },
+          { status: 400 }
+        );
+      }
+
+      const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: prompt + "\nReturn a JSON object conforming strictly to the requested response schema: " + JSON.stringify(responseSchema) }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.1,
+        }),
+      });
+
+      if (!openaiResponse.ok) {
+        const errorText = await openaiResponse.text();
+        throw new Error(`OpenAI API request failed: ${errorText}`);
+      }
+
+      const openaiData = await openaiResponse.json();
+      const textResponse = openaiData.choices?.[0]?.message?.content;
+      if (!textResponse) {
+        throw new Error("Empty response from OpenAI API.");
+      }
+
+      const parsedResults = JSON.parse(textResponse);
+      return NextResponse.json(parsedResults);
+
+    } else if (provider === "anthropic") {
+      const apiKey = customApiKey || process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json(
+          { error: "Anthropic API key is not configured. Please add it in your UI Configuration." },
+          { status: 400 }
+        );
+      }
+
+      const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 4096,
+          system: systemInstruction,
+          messages: [
+            {
+              role: "user",
+              content: prompt + "\nReturn ONLY a JSON object matching this schema. Do not output markdown code blocks or wrapper text, just raw JSON:\n" + JSON.stringify(responseSchema),
+            }
+          ],
+          temperature: 0.1,
+        }),
+      });
+
+      if (!anthropicResponse.ok) {
+        const errorText = await anthropicResponse.text();
+        throw new Error(`Anthropic API request failed: ${errorText}`);
+      }
+
+      const anthropicData = await anthropicResponse.json();
+      const textResponse = anthropicData.content?.[0]?.text;
+      if (!textResponse) {
+        throw new Error("Empty response from Anthropic API.");
+      }
+
+      const parsedResults = JSON.parse(textResponse);
+      return NextResponse.json(parsedResults);
+
+    } else {
+      const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json(
+          { error: "Gemini API key is not configured. Please add it in your UI Configuration." },
+          { status: 400 }
+        );
+      }
+
+      const ai = new GoogleGenAI({
+        apiKey: apiKey,
+        httpOptions: {
+          headers: {
+            "User-Agent": "groweasy-importer",
+          },
+        },
+      });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          systemInstruction,
+          responseMimeType: "application/json",
+          responseSchema,
+          temperature: 0.1,
+        },
+      });
+
+      const text = response.text;
+      if (!text) {
+        throw new Error("Empty response from Gemini API.");
+      }
+
+      const parsedResults = JSON.parse(text);
+      return NextResponse.json(parsedResults);
     }
-
-    const parsedResults = JSON.parse(text);
-    return NextResponse.json(parsedResults);
   } catch (error: any) {
     console.error("AI Mapping Endpoint Error:", error);
     return NextResponse.json(
