@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, DragEvent, ChangeEvent } from "react";
+import React, { useState, useRef, useEffect, DragEvent, ChangeEvent } from "react";
 import Papa from "papaparse";
 import { 
   motion, 
@@ -21,7 +21,9 @@ import {
   Info, 
   Check,
   ShieldCheck,
-  FileDown
+  FileDown,
+  Sun,
+  Moon
 } from "lucide-react";
 
 // Definitions of types
@@ -64,6 +66,13 @@ export default function Home() {
   const [rawHeaders, setRawHeaders] = useState<string[]>([]);
   const [rawRows, setRawRows] = useState<RawRecord[]>([]);
   
+  // Theme state
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Table virtualization state
+  const [scrollTop, setScrollTop] = useState<number>(0);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  
   // Processing state
   const [currentBatch, setCurrentBatch] = useState<number>(0);
   const [totalBatches, setTotalBatches] = useState<number>(0);
@@ -83,6 +92,40 @@ export default function Home() {
 
   // Active result tab
   const [activeTab, setActiveTab] = useState<"mapped" | "skipped">("mapped");
+
+  // Load and apply theme from localStorage / system preference
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = typeof localStorage !== "undefined" && localStorage.getItem ? localStorage.getItem("theme") as "light" | "dark" | null : null;
+      const systemTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      const initialTheme = savedTheme || systemTheme;
+      setTheme(initialTheme);
+      if (initialTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    if (typeof window !== "undefined") {
+      if (typeof localStorage !== "undefined" && localStorage.setItem) {
+        localStorage.setItem("theme", nextTheme);
+      }
+      if (nextTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
+  };
 
   // Handle Drag & Drop Events
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -420,23 +463,32 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50/50 text-slate-900 font-sans" id="app_root">
+    <main className="min-h-screen bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300" id="app_root">
       {/* Top Banner / Navigation */}
-      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 sm:px-6 py-4" id="app_header">
+      <header className="sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 py-4" id="app_header">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="bg-slate-900 text-white p-2 rounded-lg flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">GrowEasy</h1>
-              <p className="text-[10px] sm:text-xs text-slate-500 font-mono">CRM AI CSV Importer</p>
+              <h1 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900 dark:text-white">GrowEasy</h1>
+              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-mono">CRM AI CSV Importer</p>
             </div>
           </div>
           
-          <div className="hidden sm:flex items-center space-x-2 text-xs font-mono text-slate-500">
-            <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            <span>Secure Server-Side AI Mapping</span>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-350 transition-colors focus:outline-none cursor-pointer"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "light" ? <Moon className="h-4 w-4 text-slate-600" /> : <Sun className="h-4 w-4 text-amber-400" />}
+            </button>
+            <div className="hidden sm:flex items-center space-x-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              <span>Secure Server-Side AI Mapping</span>
+            </div>
           </div>
         </div>
       </header>
@@ -1038,52 +1090,86 @@ export default function Home() {
                           ))}
                         </div>
 
-                        {/* Desktop View: Table */}
-                        <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[600px]">
-                          <table className="w-full text-left border-collapse">
-                            <thead>
-                              <tr className="bg-slate-50 border-b border-slate-100">
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-500 w-12 text-center font-mono">#</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Created At</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Name</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Email</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Phone</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Company</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Location</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Owner</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Status</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Source</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Possession</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-slate-700">Note</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-sm">
-                              {mappedLeads.map((lead, index) => (
-                                <tr key={index} className="hover:bg-slate-50/75 transition-colors">
-                                  <td className="px-4 py-3.5 text-xs font-mono text-slate-400 text-center bg-slate-50/20">{index + 1}</td>
-                                  <td className="px-4 py-3.5 text-xs font-mono text-slate-600 whitespace-nowrap">{lead.created_at || "-"}</td>
-                                  <td className="px-4 py-3.5 font-medium text-slate-900 whitespace-nowrap">{lead.name || <span className="text-slate-300 italic">null</span>}</td>
-                                  <td className="px-4 py-3.5 font-mono text-xs text-slate-600 whitespace-nowrap">{lead.email || <span className="text-slate-300 italic">null</span>}</td>
-                                  <td className="px-4 py-3.5 font-mono text-xs text-slate-600 whitespace-nowrap">
-                                    {lead.country_code && <span className="text-slate-400 mr-1">{lead.country_code}</span>}
-                                    {lead.mobile_without_country_code || <span className="text-slate-300 italic">null</span>}
-                                  </td>
-                                  <td className="px-4 py-3.5 text-slate-600 whitespace-nowrap">{lead.company || "-"}</td>
-                                  <td className="px-4 py-3.5 text-slate-600 whitespace-nowrap truncate max-w-[150px]" title={[lead.city, lead.state, lead.country].filter(Boolean).join(", ")}>
-                                    {[lead.city, lead.state, lead.country].filter(Boolean).join(", ") || "-"}
-                                  </td>
-                                  <td className="px-4 py-3.5 text-xs text-slate-600 whitespace-nowrap truncate max-w-[120px]" title={lead.lead_owner || ""}>{lead.lead_owner || "-"}</td>
-                                  <td className="px-4 py-3.5 whitespace-nowrap">{renderStatusBadge(lead.crm_status)}</td>
-                                  <td className="px-4 py-3.5 whitespace-nowrap">{renderSourceBadge(lead.data_source)}</td>
-                                  <td className="px-4 py-3.5 text-slate-600 whitespace-nowrap">{lead.possession_time || "-"}</td>
-                                  <td className="px-4 py-3.5 text-xs text-slate-500 max-w-xs truncate" title={lead.crm_note || ""}>
-                                    {lead.crm_note || "-"}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                        {/* Desktop View: Table with custom lightweight virtualization */}
+                        {(() => {
+                          const rowHeight = 57; // Average row height in pixels
+                          const viewportHeight = 500; // max-h scroll container height
+                          const buffer = 5; // buffer rows above and below viewport
+
+                          const totalItems = mappedLeads.length;
+                          const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - buffer);
+                          const endIndex = Math.min(totalItems, Math.ceil((scrollTop + viewportHeight) / rowHeight) + buffer);
+
+                          const visibleLeads = mappedLeads.slice(startIndex, endIndex);
+
+                          const topSpacerHeight = startIndex * rowHeight;
+                          const bottomSpacerHeight = Math.max(0, (totalItems - endIndex) * rowHeight);
+
+                          return (
+                            <div 
+                              ref={tableContainerRef}
+                              onScroll={handleScroll}
+                              className="hidden md:block overflow-x-auto overflow-y-auto max-h-[500px] relative"
+                            >
+                              <table className="w-full text-left border-collapse">
+                                <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-[0_1px_0_0_rgba(226,232,240,1)] dark:shadow-[0_1px_0_0_rgba(30,41,59,1)] z-[1]">
+                                  <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-100 dark:border-slate-800">
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 w-12 text-center font-mono">#</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Created At</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Name</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Email</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Phone</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Company</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Location</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Owner</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Status</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Source</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Possession</th>
+                                    <th className="px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-350">Note</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                                  {topSpacerHeight > 0 && (
+                                    <tr style={{ height: `${topSpacerHeight}px` }}>
+                                      <td colSpan={12} className="p-0 border-0" />
+                                    </tr>
+                                  )}
+                                  {visibleLeads.map((lead, idx) => {
+                                    const index = startIndex + idx;
+                                    return (
+                                      <tr key={index} className="hover:bg-slate-50/75 dark:hover:bg-slate-800/40 transition-colors">
+                                        <td className="px-4 py-3.5 text-xs font-mono text-slate-400 text-center bg-slate-50/20 dark:bg-slate-900/10 font-semibold">{index + 1}</td>
+                                        <td className="px-4 py-3.5 text-xs font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">{lead.created_at || "-"}</td>
+                                        <td className="px-4 py-3.5 font-medium text-slate-900 dark:text-white whitespace-nowrap">{lead.name || <span className="text-slate-300 dark:text-slate-600 italic">null</span>}</td>
+                                        <td className="px-4 py-3.5 font-mono text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">{lead.email || <span className="text-slate-300 dark:text-slate-600 italic">null</span>}</td>
+                                        <td className="px-4 py-3.5 font-mono text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                          {lead.country_code && <span className="text-slate-400 dark:text-slate-500 mr-1">{lead.country_code}</span>}
+                                          {lead.mobile_without_country_code || <span className="text-slate-300 dark:text-slate-600 italic">null</span>}
+                                        </td>
+                                        <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">{lead.company || "-"}</td>
+                                        <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 whitespace-nowrap truncate max-w-[150px]" title={[lead.city, lead.state, lead.country].filter(Boolean).join(", ")}>
+                                          {[lead.city, lead.state, lead.country].filter(Boolean).join(", ") || "-"}
+                                        </td>
+                                        <td className="px-4 py-3.5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap truncate max-w-[120px]" title={lead.lead_owner || ""}>{lead.lead_owner || "-"}</td>
+                                        <td className="px-4 py-3.5 whitespace-nowrap">{renderStatusBadge(lead.crm_status)}</td>
+                                        <td className="px-4 py-3.5 whitespace-nowrap">{renderSourceBadge(lead.data_source)}</td>
+                                        <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">{lead.possession_time || "-"}</td>
+                                        <td className="px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400 max-w-xs truncate" title={lead.crm_note || ""}>
+                                          {lead.crm_note || "-"}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                  {bottomSpacerHeight > 0 && (
+                                    <tr style={{ height: `${bottomSpacerHeight}px` }}>
+                                      <td colSpan={12} className="p-0 border-0" />
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          );
+                        })()}
                       </>
                     )}
                   </div>

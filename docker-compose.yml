@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  groweasy-importer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: groweasy-csv-importer
+    ports:
+      - "3000:3000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - APP_URL=${APP_URL}
+    restart: always
