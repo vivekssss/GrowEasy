@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Key, Check, AlertCircle } from "lucide-react";
+import { Key, Check, AlertCircle, ChevronDown } from "lucide-react";
 
 interface ApiKeyConfigProps {
   provider: "gemini" | "openai" | "anthropic";
@@ -34,12 +34,20 @@ export default function ApiKeyConfig({
           <Key className="h-4 w-4 text-indigo-500" />
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">AI Engine Configuration</h3>
         </div>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
-        >
-          {isOpen ? "Hide Settings" : "Configure AI & Keys"}
-        </button>
+        
+        <div className="relative group">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
+          >
+            <span>{isOpen ? "Hide Settings" : "Configure AI & Keys"}</span>
+            <ChevronDown className={`h-3.5 w-3.5 text-slate-500 dark:text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
+          </button>
+          
+          <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-slate-900 dark:bg-slate-800 text-white text-[10px] px-2 py-1 rounded shadow-md whitespace-nowrap z-[11] border border-slate-800 dark:border-slate-700 pointer-events-none animate-in fade-in slide-in-from-bottom-1 duration-150">
+            {isOpen ? "Collapse settings drawer" : "Select AI model (Gemini/OpenAI/Claude) & set custom keys"}
+          </div>
+        </div>
       </div>
 
       {hasServerError && (
