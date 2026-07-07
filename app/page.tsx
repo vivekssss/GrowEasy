@@ -504,9 +504,9 @@ export default function Home() {
 
         <div className="hidden sm:block mb-10 max-w-2xl mx-auto" id="desktop_stepper">
           <div className="flex items-center justify-between relative">
-            <div className="absolute left-4 right-4 top-4 h-0.5 bg-slate-200 dark:bg-slate-800 -z-10" />
+            <div className="absolute left-4 right-4 top-4 h-0.5 bg-slate-200 dark:bg-slate-800 z-0" />
             <div
-              className="absolute left-4 top-4 h-0.5 bg-emerald-500 transition-all duration-500 -z-10"
+              className="absolute left-4 top-4 h-0.5 bg-emerald-500 transition-all duration-500 z-0"
               style={{
                 width:
                   step === "upload" ? "0%" :
@@ -515,8 +515,8 @@ export default function Home() {
               }}
             />
 
-            <div className="flex flex-col items-center">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 ${
+            <div className="flex flex-col items-center relative z-10">
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 relative z-10 ${
                 step === "upload" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900" : "bg-emerald-500 text-white"
               }`}>
                 {step !== "upload" ? <Check className="h-4 w-4" /> : "1"}
@@ -524,8 +524,8 @@ export default function Home() {
               <span className="text-xs font-medium mt-2 text-slate-600 dark:text-slate-400">Upload CSV</span>
             </div>
 
-            <div className="flex flex-col items-center">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 ${
+            <div className="flex flex-col items-center relative z-10">
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 relative z-10 ${
                 step === "preview" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900" :
                 step === "processing" || step === "results" ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
               }`}>
@@ -534,8 +534,8 @@ export default function Home() {
               <span className="text-xs font-medium mt-2 text-slate-600 dark:text-slate-400">Preview Data</span>
             </div>
 
-            <div className="flex flex-col items-center">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 ${
+            <div className="flex flex-col items-center relative z-10">
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 relative z-10 ${
                 step === "processing" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900" :
                 step === "results" ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
               }`}>
@@ -544,8 +544,8 @@ export default function Home() {
               <span className="text-xs font-medium mt-2 text-slate-600 dark:text-slate-400">AI Extracting</span>
             </div>
 
-            <div className="flex flex-col items-center">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 ${
+            <div className="flex flex-col items-center relative z-10">
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300 relative z-10 ${
                 step === "results" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900" : "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
               }`}>
                 4

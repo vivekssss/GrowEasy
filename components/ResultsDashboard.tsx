@@ -118,7 +118,7 @@ export default function ResultsDashboard({
       </div>
 
       <div className="space-y-4">
-        <div className="border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <nav className="-mb-px flex space-x-4 sm:space-x-8 w-full sm:w-auto">
             <button
               onClick={() => setActiveTab("mapped")}
@@ -130,7 +130,7 @@ export default function ResultsDashboard({
             >
               <span>Mapped Leads</span>
               <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-mono font-medium ${
-                activeTab === "mapped" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950" : "bg-slate-100 dark:bg-slate-805 text-slate-600 dark:text-slate-400"
+                activeTab === "mapped" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
               }`}>{mappedLeads.length}</span>
             </button>
 
@@ -144,7 +144,7 @@ export default function ResultsDashboard({
             >
               <span>Skipped Records</span>
               <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-mono font-medium ${
-                activeTab === "skipped" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950" : "bg-slate-100 dark:bg-slate-805 text-slate-600 dark:text-slate-400"
+                activeTab === "skipped" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
               }`}>{skippedLeads.length}</span>
             </button>
           </nav>
@@ -162,7 +162,7 @@ export default function ResultsDashboard({
               </div>
             ) : (
               <>
-                <div className="block md:hidden divide-y divide-slate-100 dark:divide-slate-805 max-h-[600px] overflow-y-auto" id="mapped_leads_mobile_list">
+                <div className="block md:hidden divide-y divide-slate-100 dark:divide-slate-800 max-h-[600px] overflow-y-auto" id="mapped_leads_mobile_list">
                   {mappedLeads.map((lead, index) => (
                     <div key={index} className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors space-y-2.5">
                       <div className="flex items-start justify-between gap-2">
@@ -180,14 +180,14 @@ export default function ResultsDashboard({
                         <div>
                           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Email</p>
                           <p className="text-slate-700 dark:text-slate-300 font-mono text-[11px] truncate mt-0.5" title={lead.email || ""}>
-                            {lead.email || <span className="text-slate-305 dark:text-slate-600 italic">null</span>}
+                            {lead.email || <span className="text-slate-400 dark:text-slate-600 italic">null</span>}
                           </p>
                         </div>
                         <div>
                           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Phone</p>
                           <p className="text-slate-700 dark:text-slate-300 font-mono text-[11px] mt-0.5">
                             {lead.country_code && <span className="text-slate-400 mr-0.5">{lead.country_code}</span>}
-                            {lead.mobile_without_country_code || <span className="text-slate-305 dark:text-slate-600 italic">null</span>}
+                            {lead.mobile_without_country_code || <span className="text-slate-400 dark:text-slate-600 italic">null</span>}
                           </p>
                         </div>
                         <div>
@@ -205,7 +205,7 @@ export default function ResultsDashboard({
                       </div>
 
                       {lead.crm_note && (
-                        <div className="bg-slate-50/70 dark:bg-slate-950/55 p-2 rounded border border-slate-100 dark:border-slate-805 text-[11px] text-slate-600 dark:text-slate-400">
+                        <div className="bg-slate-50/70 dark:bg-slate-950/55 p-2 rounded border border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
                           <span className="font-semibold text-slate-500">Note:</span> {lead.crm_note}
                         </div>
                       )}
@@ -309,7 +309,7 @@ export default function ResultsDashboard({
               </div>
             ) : (
               <>
-                <div className="block md:hidden divide-y divide-slate-100 dark:divide-slate-805 max-h-[600px] overflow-y-auto" id="skipped_leads_mobile_list">
+                <div className="block md:hidden divide-y divide-slate-100 dark:divide-slate-800 max-h-[600px] overflow-y-auto" id="skipped_leads_mobile_list">
                   {skippedLeads.map((skipped, index) => (
                     <div key={index} className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors space-y-2.5">
                       <div className="flex items-center justify-between gap-2">
@@ -319,7 +319,7 @@ export default function ResultsDashboard({
                           {skipped.reason}
                         </span>
                       </div>
-                      <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-100 dark:border-slate-805 max-h-[150px] overflow-y-auto">
+                      <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 max-h-[150px] overflow-y-auto">
                         <pre className="whitespace-pre-wrap font-sans text-xs">
                           {JSON.stringify(skipped.originalRow, null, 2)}
                         </pre>
@@ -348,7 +348,7 @@ export default function ResultsDashboard({
                             </span>
                           </td>
                           <td className="px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                            <pre className="whitespace-pre-wrap font-sans text-xs bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-100 dark:border-slate-805 max-w-2xl overflow-x-auto">
+                            <pre className="whitespace-pre-wrap font-sans text-xs bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 max-w-2xl overflow-x-auto">
                               {JSON.stringify(skipped.originalRow, null, 2)}
                             </pre>
                           </td>

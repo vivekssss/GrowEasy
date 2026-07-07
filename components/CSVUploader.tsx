@@ -106,10 +106,10 @@ export default function CSVUploader({
               className={`mx-auto w-16 h-16 rounded-2xl border flex items-center justify-center mb-4 shadow-sm transition-all duration-300 ${
                 isDragging
                   ? "bg-indigo-600 border-indigo-500 text-white scale-110 shadow-indigo-200"
-                  : "bg-slate-50 dark:bg-slate-850 border-slate-100 dark:border-slate-800 text-slate-450 dark:text-slate-500"
+                  : "bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500"
               }`}
             >
-              <Upload className={`h-8 w-8 transition-colors ${isDragging ? "text-white" : "text-slate-600 dark:text-slate-400"}`} />
+              <Upload className={`h-8 w-8 transition-colors ${isDragging ? "text-white" : "text-slate-600 dark:text-slate-450"}`} />
             </motion.div>
 
             <h3 className={`text-lg font-semibold transition-colors duration-300 ${isDragging ? "text-indigo-900 font-bold" : "text-slate-900 dark:text-white"}`}>
@@ -119,7 +119,7 @@ export default function CSVUploader({
               {isDragging ? "Release your file to begin instant ingestion" : "Drag and drop your spreadsheet file here, or click to browse directories."}
             </p>
             <div className={`mt-6 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-mono transition-all duration-300 ${
-              isDragging ? "bg-indigo-100 text-indigo-700 font-semibold scale-105" : "bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-305"
+              isDragging ? "bg-indigo-100 text-indigo-700 font-semibold scale-105" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
             }`}>
               <span>Accepted file format: .csv</span>
             </div>
