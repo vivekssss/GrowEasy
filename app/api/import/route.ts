@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Lazy initialize the modern @google/genai client with the API key inside the handler
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
       httpOptions: {
@@ -29,7 +28,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Define the strict structured response schema using the @google/genai Type enum
     const responseSchema = {
       type: Type.OBJECT,
       properties: {
@@ -163,7 +161,6 @@ ${JSON.stringify(originalHeaders)}
 Process the following batch of raw CSV records:
 ${JSON.stringify(records)}`;
 
-    // Call the Gemini API with structured JSON output configured
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
       contents: prompt,

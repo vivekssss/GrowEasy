@@ -26,7 +26,7 @@ import {
   Moon
 } from "lucide-react";
 
-// Definitions of types
+
 interface RawRecord {
   [key: string]: string;
 }
@@ -58,7 +58,7 @@ interface ExtractedResult {
 
 type StepType = "upload" | "preview" | "processing" | "results";
 
-const BATCH_SIZE = 15; // Safe batch size to prevent server timeout and ensure prompt precision
+const BATCH_SIZE = 15; 
 
 export default function Home() {
   const [step, setStep] = useState<StepType>("upload");
@@ -66,34 +66,34 @@ export default function Home() {
   const [rawHeaders, setRawHeaders] = useState<string[]>([]);
   const [rawRows, setRawRows] = useState<RawRecord[]>([]);
   
-  // Theme state
+  
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  // Table virtualization state
+  
   const [scrollTop, setScrollTop] = useState<number>(0);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   
-  // Processing state
+  
   const [currentBatch, setCurrentBatch] = useState<number>(0);
   const [totalBatches, setTotalBatches] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processingError, setProcessingError] = useState<string | null>(null);
   
-  // Results accumulators
+  
   const [mappedLeads, setMappedLeads] = useState<CRMRecord[]>([]);
   const [skippedLeads, setSkippedLeads] = useState<{ originalRow: RawRecord; reason: string; rowIndex: number }[]>([]);
   const [totalProcessedCount, setTotalProcessedCount] = useState<number>(0);
 
-  // Drag over states
+  
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isIngesting, setIsIngesting] = useState<boolean>(false);
   const [ingestProgress, setIngestProgress] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Active result tab
+  
   const [activeTab, setActiveTab] = useState<"mapped" | "skipped">("mapped");
 
-  // Load and apply theme from localStorage / system preference
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedTheme = typeof localStorage !== "undefined" && localStorage.getItem ? localStorage.getItem("theme") as "light" | "dark" | null : null;
@@ -127,7 +127,7 @@ export default function Home() {
     setScrollTop(e.currentTarget.scrollTop);
   };
 
-  // Handle Drag & Drop Events
+  
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
@@ -153,7 +153,7 @@ export default function Home() {
     }
   };
 
-  // Parsing CSV with PapaParse on client side (Step 2 Preview Requirement)
+  
   const processFile = (file: File) => {
     if (!file.name.endsWith(".csv")) {
       alert("Invalid file format. Please upload a valid CSV file.");
@@ -164,7 +164,7 @@ export default function Home() {
     setIsIngesting(true);
     setIngestProgress(0);
 
-    // Animate ingest progress smoothly
+    
     const interval = setInterval(() => {
       setIngestProgress((prev) => {
         if (prev >= 100) {
@@ -181,7 +181,7 @@ export default function Home() {
       complete: (results) => {
         if (results.data && results.data.length > 0) {
           const headers = results.meta.fields || Object.keys(results.data[0] as object);
-          // Wait slightly for the animation to look fluid, premium, and rewarding
+          
           setTimeout(() => {
             setRawHeaders(headers);
             setRawRows(results.data as RawRecord[]);
@@ -203,7 +203,7 @@ export default function Home() {
     });
   };
 
-  // Main Batching Mapping Engine
+  
   const startMapping = async (resumeFromBatch = 0) => {
     setIsProcessing(true);
     setProcessingError(null);
@@ -225,18 +225,18 @@ export default function Home() {
       while (batchIdx < calculatedTotalBatches) {
         setCurrentBatch(batchIdx);
         
-        // Slice rows for current batch
+        
         const startIdx = batchIdx * BATCH_SIZE;
         const endIdx = Math.min(startIdx + BATCH_SIZE, rawRows.length);
         const rawBatchSlice = rawRows.slice(startIdx, endIdx);
         
-        // Map to include the original row index
+        
         const recordsToSend = rawBatchSlice.map((row, index) => ({
           originalIndex: startIdx + index,
           data: row
         }));
 
-        // Send POST request to Next.js API Route (Server-Side call)
+        
         const response = await fetch("/api/import", {
           method: "POST",
           headers: {
@@ -258,7 +258,7 @@ export default function Home() {
         if (data.results && Array.isArray(data.results)) {
           const batchResults: ExtractedResult[] = data.results;
           
-          // Accumulate successes and skips
+          
           const newMapped: CRMRecord[] = [];
           const newSkipped: { originalRow: RawRecord; reason: string; rowIndex: number }[] = [];
 
@@ -305,12 +305,12 @@ export default function Home() {
     setProcessingError(null);
   };
 
-  // Helper to trigger manual file select
+  
   const triggerFileSelect = () => {
     fileInputRef.current?.click();
   };
 
-  // Render Status Badge
+  
   const renderStatusBadge = (status: string | null) => {
     if (!status) return <span className="text-xs text-slate-400 font-mono">-</span>;
     
@@ -348,7 +348,7 @@ export default function Home() {
     }
   };
 
-  // Render Data Source Badge
+  
   const renderSourceBadge = (source: string | null) => {
     if (!source) return <span className="text-xs text-slate-400 font-mono">-</span>;
     return (
@@ -358,7 +358,7 @@ export default function Home() {
     );
   };
 
-  // Generate mapped CSV on client side for download (Craftsmanship Feature)
+  
   const downloadMappedCSV = () => {
     if (mappedLeads.length === 0) return;
     
@@ -413,7 +413,7 @@ export default function Home() {
     document.body.removeChild(link);
   };
 
-  // Generate a messy mock CSV for the user to download and test immediately
+  
   const downloadDemoCSV = () => {
     const headers = [
       "First Name",
@@ -464,7 +464,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300" id="app_root">
-      {/* Top Banner / Navigation */}
+      {}
       <header className="sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 py-4" id="app_header">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -493,10 +493,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Container */}
+      {}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         
-        {/* Mobile Stepper Header */}
+        {}
         <div className="block sm:hidden mb-6" id="mobile_stepper">
           <div className="flex items-center justify-between px-1">
             <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
@@ -523,12 +523,12 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Desktop Stepper Header */}
+        {}
         <div className="hidden sm:block mb-10 max-w-2xl mx-auto" id="desktop_stepper">
           <div className="flex items-center justify-between relative">
-            {/* Background line, perfectly center aligned with the 32px (h-8) circles at top-4 (16px) */}
+            {}
             <div className="absolute left-4 right-4 top-4 h-0.5 bg-slate-200 -z-10" />
-            {/* Animated active path line, perfectly matched */}
+            {}
             <div 
               className="absolute left-4 top-4 h-0.5 bg-emerald-500 transition-all duration-500 -z-10" 
               style={{ 
@@ -579,10 +579,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Content Stages */}
+        {}
         <AnimatePresence mode="wait">
           
-          {/* STEP 1: UPLOAD AREA */}
+          {}
           {step === "upload" && (
             <motion.div
               key="upload"
@@ -645,7 +645,7 @@ export default function Home() {
                       Parsing spreadsheet headers and raw rows
                     </p>
 
-                    {/* Progressive Bar */}
+                    {}
                     <div className="w-48 sm:w-64 bg-slate-150 h-2 rounded-full mt-6 overflow-hidden border border-slate-200">
                       <div 
                         className="h-full bg-emerald-500 rounded-full transition-all duration-100"
@@ -691,7 +691,7 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Demo Download Section (Aesthetic & Practical craftsmanship) */}
+              {}
               <div className="mt-6 bg-slate-900 text-white rounded-2xl p-6 shadow-md border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" id="demo_csv_download_callout">
                 <div className="space-y-1">
                   <h4 className="font-semibold text-sm flex items-center gap-1.5 text-indigo-300">
@@ -726,7 +726,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* STEP 2: PREVIEW RAW DATA */}
+          {}
           {step === "preview" && (
             <motion.div
               key="preview"
@@ -766,7 +766,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Table wrapper with scrolling and sticky headers */}
+              {}
               <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm" id="preview_table_container">
                 <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center">
@@ -815,7 +815,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* STEP 3: AI PROCESSING */}
+          {}
           {step === "processing" && (
             <motion.div
               key="processing"
@@ -841,7 +841,7 @@ export default function Home() {
                   This matches custom headers, applies strict status boundaries, and handles multiple emails and numbers.
                 </p>
 
-                {/* Batch Progress Bar */}
+                {}
                 <div className="mt-8 space-y-2">
                   <div className="flex justify-between text-xs font-mono font-medium text-slate-500">
                     <span>Mapping Progress</span>
@@ -858,7 +858,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Active operations log */}
+                {}
                 <div className="mt-8 p-4 bg-slate-50 rounded-xl border border-slate-100 text-left">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 font-mono">Operations Log</h4>
                   <div className="text-xs font-mono space-y-1.5 text-slate-600">
@@ -883,7 +883,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Error handling during processing */}
+                {}
                 {processingError && (
                   <div className="mt-6 bg-rose-50 border border-rose-100 rounded-xl p-4 text-left">
                     <div className="flex items-start space-x-2">
@@ -906,7 +906,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* STEP 4: RESULTS DASHBOARD */}
+          {}
           {step === "results" && (
             <motion.div
               key="results"
@@ -943,7 +943,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Bento statistics grid */}
+              {}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm">
                   <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400">Total Rows Processed</p>
@@ -984,7 +984,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Tabs for mapped vs skipped */}
+              {}
               <div className="space-y-4">
                 <div className="border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <nav className="-mb-px flex space-x-4 sm:space-x-8 w-full sm:w-auto">
@@ -1020,7 +1020,7 @@ export default function Home() {
                   <span className="text-[10px] sm:text-xs font-mono text-slate-400">Enforcing strict CRM rules</span>
                 </div>
 
-                {/* Tab Panel: Mapped */}
+                {}
                 {activeTab === "mapped" && (
                   <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm" id="mapped_leads_container">
                     {mappedLeads.length === 0 ? (
@@ -1033,7 +1033,7 @@ export default function Home() {
                       </div>
                     ) : (
                       <>
-                        {/* Mobile View: Cards */}
+                        {}
                         <div className="block md:hidden divide-y divide-slate-100 max-h-[600px] overflow-y-auto" id="mapped_leads_mobile_list">
                           {mappedLeads.map((lead, index) => (
                             <div key={index} className="p-4 hover:bg-slate-50/50 transition-colors space-y-2.5">
@@ -1090,11 +1090,11 @@ export default function Home() {
                           ))}
                         </div>
 
-                        {/* Desktop View: Table with custom lightweight virtualization */}
+                        {}
                         {(() => {
-                          const rowHeight = 57; // Average row height in pixels
-                          const viewportHeight = 500; // max-h scroll container height
-                          const buffer = 5; // buffer rows above and below viewport
+                          const rowHeight = 57; 
+                          const viewportHeight = 500; 
+                          const buffer = 5; 
 
                           const totalItems = mappedLeads.length;
                           const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - buffer);
@@ -1175,7 +1175,7 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Tab Panel: Skipped */}
+                {}
                 {activeTab === "skipped" && (
                   <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm" id="skipped_leads_container">
                     {skippedLeads.length === 0 ? (
@@ -1188,7 +1188,7 @@ export default function Home() {
                       </div>
                     ) : (
                       <>
-                        {/* Mobile View: Cards */}
+                        {}
                         <div className="block md:hidden divide-y divide-slate-100 max-h-[600px] overflow-y-auto" id="skipped_leads_mobile_list">
                           {skippedLeads.map((skipped, index) => (
                             <div key={index} className="p-4 hover:bg-slate-50/50 transition-colors space-y-2.5">
@@ -1208,7 +1208,7 @@ export default function Home() {
                           ))}
                         </div>
 
-                        {/* Desktop View: Table */}
+                        {}
                         <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[600px]">
                           <table className="w-full text-left border-collapse">
                             <thead>

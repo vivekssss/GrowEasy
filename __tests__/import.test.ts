@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { POST } from "@/app/api/import/route";
 import { NextRequest } from "next/server";
 
-// Mock the modern @google/genai module and its subcomponents
+
 vi.mock("@google/genai", () => {
   class GoogleGenAI {
     models = {
@@ -51,7 +51,7 @@ vi.mock("@google/genai", () => {
 
 describe("POST /api/import", () => {
   it("processes records successfully via mocked Gemini model", async () => {
-    // Set a dummy API key for the test execution context
+    
     process.env.GEMINI_API_KEY = "dummy-api-key";
 
     const reqBody = {
@@ -107,7 +107,7 @@ describe("POST /api/import", () => {
     const json = await response.json();
     expect(json.error).toContain("Gemini API key is not configured");
 
-    // Restore API key
+    
     process.env.GEMINI_API_KEY = originalKey;
   });
 });
